@@ -157,9 +157,17 @@ class DeviceReadings(BaseModel):
 
     # class Meta:
     #     db_table = 'tbldevicetransaction'
+class Test(BaseModel):
+    ts = DateTimeField(default=datetime.datetime.now)
 
 class Utils(object):
     
+    def bulk_insert_device_readings(self,data_source):
+        # Insert rows 100 at a time.
+        with database.atomic():
+            for idx in range(0, len(data_source), 100):
+                DeviceReadings.insert_many(data_source[idx:idx+100]).execute()
+
     def setup_tables(self):
         database.create_tables([Country, Device, User, DeviceReadings])
         # database.create_tables([DeviceReadings])
@@ -195,4 +203,10 @@ class Utils(object):
 
 
 if __name__ == "__main__":
-    Utils().setup_tables()
+    # Utils().setup_tables()
+    test = Test()
+    dt = '08-08-2017 08:14'
+    print(test.ts)
+    datetime_object = datetime.datetime.strptime(dt, '%d-%m-%Y %H:%M')
+    print(datetime_object)
+    print(type(datetime_object))

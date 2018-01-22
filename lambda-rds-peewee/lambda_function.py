@@ -33,9 +33,11 @@ def lambda_handler(event, context):
     This function inserts content into mysql RDS instance
     """
     class MySQLModel(pw.Model):
-    """A base model that will use our MySQL database"""
-    class Meta:
-        database = myDB
+        '''
+        base model that will use our MySQL database
+        '''
+        class Meta:
+            database = myDB
 
     class User(MySQLModel):
         username = pw.CharField()
@@ -48,5 +50,4 @@ def lambda_handler(event, context):
         logger.info("Connected to db")
     except Exception as e:
         logger.error("Unable to connect to the DB")
-    
     return "Added %d items to RDS MySQL table" %(item_count)

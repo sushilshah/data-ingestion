@@ -1,18 +1,10 @@
 import sys
 import logging
 from peewee import *
-# import rds_config
 import datetime
 import configparser
 import os
 
-
-
-# rds_host  = rds_config.db_endpoint
-# name = rds_config.db_username
-# password = rds_config.db_password
-# db_name = rds_config.db_name
-# port = rds_config.port
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -26,10 +18,10 @@ try:
     logging.debug('url       : ' + cp.get(db_env, 'db_endpoint'))
     
     rds_host = cp.get(db_env, 'db_endpoint')
-    db_username =  cp.get(db_env,'db_username')
-    password = cp.get(db_env,'db_password')
-    db_name = cp.get(db_env,'db_name')
-    port = cp.get(db_env,'port')
+    db_username =  cp.get(db_env, 'db_username')
+    password = cp.get(db_env, 'db_password')
+    db_name = cp.get(db_env, 'db_name')
+    port = cp.get(db_env, 'port')
 
 # database = MySQLDatabase('motovibr', **{'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'password': 'root'})
     database = MySQLDatabase(db_name, host=rds_host, port=3306, user=db_username, passwd=password)
@@ -157,8 +149,7 @@ class DeviceReadings(BaseModel):
 
     # class Meta:
     #     db_table = 'tbldevicetransaction'
-class Test(BaseModel):
-    ts = DateTimeField(default=datetime.datetime.now)
+
 
 class Utils(object):
     

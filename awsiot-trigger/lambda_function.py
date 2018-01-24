@@ -84,9 +84,3 @@ def check_notify_alert(d_reading_obj):
         return alerts    
     except Exception as exp:
         raise exp
-
-for i in range(10):
-    event = {}
-    payload = create_mock_data(event)
-    alerts = check_notify_alert(payload)
-    print(alerts, i)

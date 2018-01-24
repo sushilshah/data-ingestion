@@ -51,7 +51,7 @@ def create_mock_data(base_obj):
         '''Acceptable values:
         x_mms : 0-18, y_mms : 0-21, z_mms : 0-15, x_hz  : 5-47, y_hz  : 5-31, z_hz  : 5-51'''
         mock['x_mms'], mock['y_mms'], mock['z_mms'], mock['x_hz'], mock['y_hz'], mock['z_hz'] = \
-        [randint(0,25), randint(0,30), randint(0,25), randint(5,60), randint(5,50), randint(5,60)]
+        [randint(0,20), randint(0,23), randint(0,20), randint(5,50), randint(5,35), randint(5,53)]
         return mock
     except Exception as exp:
         raise exp
@@ -79,13 +79,13 @@ def check_notify_alert(d_reading_obj):
             alerts['x_hz'] = d_reading_obj['x_hz']
         if not (5 <= d_reading_obj['y_hz'] <= 31):
             alerts['y_hz'] = d_reading_obj['y_hz']
-        if not (5 <= d_reading_obj['z_hz'] <= 31):
+        if not (5 <= d_reading_obj['z_hz'] <= 51):
             alerts['z_hz'] = d_reading_obj['z_hz']
         return alerts    
     except Exception as exp:
         raise exp
 
-for i in range(100):
+for i in range(10):
     event = {}
     payload = create_mock_data(event)
     alerts = check_notify_alert(payload)

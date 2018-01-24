@@ -3,7 +3,7 @@ import logging
 import datetime
 from model import Device, Utils
 import boto3
-
+import json
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -40,6 +40,7 @@ def lambda_handler(event, context):
                 d_reading_obj = construct_device_reading_data(line)
                 if d_reading_obj:
                     data_source.append(d_reading_obj)
+                    check_notify_alert(d_reading_obj)
             idx += 1
             # logger.info("IDX NO %s", idx)
         logger.info("Adding data to the db. IDX : %s", idx)
@@ -106,6 +107,33 @@ def read_csv_s3(event):
         logger.exception("Exception occured while reading file from s3 %s", exp)
         raise exp
 
+    def check_notify_alert(d_reading_obj):
+        #process alert threshold and invoke alert lambda
+        alerts = {}
+        if not (0 <= d_reading_obj['x_mms'] <= 18):
+            alerts['x_mms'] = d_reading_obj['x_mms']
+        if not (0 <= d_reading_obj['y_mms'] <= 21):
+            alerts['y_mms'] = d_reading_obj['y_mms']
+        if not (0 <= d_reading_obj['z_mms'] <= 15):
+            alerts['z_mms'] = d_reading_obj['z_mms']
+        if not (5 <= d_reading_obj['x_hz'] <= 47):
+            alerts['x_hz'] = d_reading_obj['x_hz']
+        if not (5 <= d_reading_obj['y_hz'] <= 31):
+            alerts['y_hz'] = d_reading_obj['y_hz']
+        if not (5 <= d_reading_obj['z_hz'] <= 31):
+            alerts['z_hz'] = d_reading_obj['z_hz']
+        
+        if alerts:
+            # Invoke lambda and send notification
+            client = boto3.client('lambda')
+            d_reading_obj['alerts'] = alerts
+            payload = d_reading_obj
+            response = client.invoke(
+                FunctionName='insert-alert',
+                InvocationType='Event',
+                Payload=json.dumps({"test" : "payload"})
+            )
+            return response
 
 if __name__ == "__main__":
     lambda_handler(None, None)

@@ -107,33 +107,33 @@ def read_csv_s3(event):
         logger.exception("Exception occured while reading file from s3 %s", exp)
         raise exp
 
-    def check_notify_alert(d_reading_obj):
+def check_notify_alert(d_reading_obj):
         #process alert threshold and invoke alert lambda
-        alerts = {}
-        if not (0 <= d_reading_obj['x_mms'] <= 18):
-            alerts['x_mms'] = d_reading_obj['x_mms']
-        if not (0 <= d_reading_obj['y_mms'] <= 21):
-            alerts['y_mms'] = d_reading_obj['y_mms']
-        if not (0 <= d_reading_obj['z_mms'] <= 15):
-            alerts['z_mms'] = d_reading_obj['z_mms']
-        if not (5 <= d_reading_obj['x_hz'] <= 47):
-            alerts['x_hz'] = d_reading_obj['x_hz']
-        if not (5 <= d_reading_obj['y_hz'] <= 31):
-            alerts['y_hz'] = d_reading_obj['y_hz']
-        if not (5 <= d_reading_obj['z_hz'] <= 31):
-            alerts['z_hz'] = d_reading_obj['z_hz']
-        
-        if alerts:
-            # Invoke lambda and send notification
-            client = boto3.client('lambda')
-            d_reading_obj['alerts'] = alerts
-            payload = d_reading_obj
-            response = client.invoke(
-                FunctionName='insert-alert',
-                InvocationType='Event',
-                Payload=json.dumps({"test" : "payload"})
-            )
-            return response
+    alerts = {}
+    if not (0 <= d_reading_obj['x_mms'] <= 18):
+        alerts['x_mms'] = d_reading_obj['x_mms']
+    if not (0 <= d_reading_obj['y_mms'] <= 21):
+        alerts['y_mms'] = d_reading_obj['y_mms']
+    if not (0 <= d_reading_obj['z_mms'] <= 15):
+        alerts['z_mms'] = d_reading_obj['z_mms']
+    if not (5 <= d_reading_obj['x_hz'] <= 47):
+        alerts['x_hz'] = d_reading_obj['x_hz']
+    if not (5 <= d_reading_obj['y_hz'] <= 31):
+        alerts['y_hz'] = d_reading_obj['y_hz']
+    if not (5 <= d_reading_obj['z_hz'] <= 31):
+        alerts['z_hz'] = d_reading_obj['z_hz']
+    
+    if alerts:
+        # Invoke lambda and send notification
+        client = boto3.client('lambda')
+        d_reading_obj['alerts'] = alerts
+        payload = d_reading_obj
+        response = client.invoke(
+            FunctionName='insert-alert',
+            InvocationType='Event',
+            Payload=json.dumps({"test" : "payload"})
+        )
+        return response
 
 if __name__ == "__main__":
     lambda_handler(None, None)

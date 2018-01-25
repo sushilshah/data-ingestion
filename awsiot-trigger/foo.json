@@ -1,0 +1,58 @@
+{
+    "resource": "/microservice-http-endpoint-python3",
+    "path": "/microservice-http-endpoint-python3",
+    "httpMethod": "GET",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate",
+        "cache-control": "no-cache",
+        "CloudFront-Forwarded-Proto": "https",
+        "CloudFront-Is-Desktop-Viewer": "true",
+        "CloudFront-Is-Mobile-Viewer": "false",
+        "CloudFront-Is-SmartTV-Viewer": "false",
+        "CloudFront-Is-Tablet-Viewer": "false",
+        "CloudFront-Viewer-Country": "IN",
+        "Host": "j9lses5t11.execute-api.ap-southeast-2.amazonaws.com",
+        "Postman-Token": "d58ea40f-c192-4be3-9c2f-f9d0513e2a38",
+        "User-Agent": "PostmanRuntime/7.1.1",
+        "Via": "1.1 f8d0fea8a77d5cb2a5a4cecc02e8b2a3.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "wPp7V6agX2RuUwXh3QeQDnWvWh4g3GD6plW1PcguWh9vFmuhYdYMLA==",
+        "X-Amzn-Trace-Id": "Root=1-5a696b6e-53a42b9e352c45a154c3134a",
+        "X-Forwarded-For": "116.50.59.180, 54.182.242.128",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "queryStringParameters": {
+        "TableName": "device_status"
+    },
+    "pathParameters": null,
+    "stageVariables": null,
+    "requestContext": {
+        "requestTime": "25/Jan/2018:05:30:22 +0000",
+        "path": "/prod/microservice-http-endpoint-python3",
+        "accountId": "508513473898",
+        "protocol": "HTTP/1.1",
+        "resourceId": "i22wsx",
+        "stage": "prod",
+        "requestTimeEpoch": 1516858222876,
+        "requestId": "d6feef9a-0190-11e8-8ccb-db33340c9503",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "accountId": null,
+            "cognitoIdentityId": null,
+            "caller": null,
+            "sourceIp": "116.50.59.180",
+            "accessKey": null,
+            "cognitoAuthenticationType": null,
+            "cognitoAuthenticationProvider": null,
+            "userArn": null,
+            "userAgent": "PostmanRuntime/7.1.1",
+            "user": null
+        },
+        "resourcePath": "/microservice-http-endpoint-python3",
+        "httpMethod": "GET",
+        "apiId": "j9lses5t11"
+    },
+    "body": null,
+    "isBase64Encoded": false
+}

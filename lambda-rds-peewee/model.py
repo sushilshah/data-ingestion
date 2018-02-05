@@ -203,7 +203,7 @@ class Utils(object):
 
 
 if __name__ == "__main__":
-    # Utils().setup_tables()
+    Utils().setup_tables()
     test = Test()
     dt = '08-08-2017 08:14'
     print(test.ts)

@@ -1,13 +1,68 @@
-import boto3
+import boto3, json
+import logging
+import time
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 
 def lambda_handler(event, context):
-    # raw_data = get_raw_data()
-    raw_data = get_mock_data()
-    # print(raw_data)
+    raw_data = get_raw_data()
+    # raw_data = get_mock_data()
 
-    foo = format_to_json(raw_data)
-    print(foo)
-    return raw_data
+    item_list = format_to_json(raw_data)
+    succ = 0
+    fail = 0
+    
+    _item = {'origin': 'cmapssdata', 'id': '1', 'cycle': '8', 'setting1': '-0.0034', 'setting2': '0.0003', 'setting3': '100.0', 's1': '518.67', 's2': '642.56', 's3': '1582.96', 's4': '1400.97', 's5': '14.62', 's6': '21.61', 's7': '553.85', 's8': '2388.00', 's9': '9040.80', 's10': '1.30', 's11': '47.24', 's12': '522.47', 's13': '2388.03', 's14': '8131.07', 's15': '8.4076', 's16': '0.03', 's17': '391', 's18': '2388', 's19': '100.00', 's20': '38.97', 's21': '23.3106'}
+    # response = insert_to_dynamo(_item)
+    # batch_write(item_list)
+    for item in item_list:
+        try:
+            logger.info("inserting item : %s", item)
+            logger.info(int(time.time()))
+            response = insert_to_dynamo(item)
+            succ += 1
+            logger.info("**Success $$ : %s", succ)
+        except Exception as exp:
+            logger.exception(exp)
+            fail += 1
+            logger.info("**Fail : %s", fail)
+    
+    logger.info("Success : %s", succ)
+    logger.info("Fail : %s", fail)
+    
+    return {'Hello' : 'World'}
+
+
+
+def batch_write(item_list):
+    try:
+        dynamodb = boto3.resource('dynamodb')
+        table_name='vib-mon-sls-device-dev'
+        table = dynamodb.Table(table_name)
+        logger.info("Batch ==> %s", item_list)
+        with table.batch_writer() as batch:
+            for item in item_list:
+                batch.put_item(
+                    Item=item
+                )
+    except Exception as exp:
+        logger.exception(exp)
+
+    
+def insert_to_dynamo(payload) :
+    dynamodb = boto3.resource('dynamodb')
+    table_name='vib-mon-sls-device-dev'
+    # table_name = 'device_status'
+    table = dynamodb.Table(table_name)
+
+    response = table.put_item(
+        Item=payload
+    )
+    logger.info("insert_to_dynamo response %s", response)
+    return response
+
 
 def format_to_json(raw_data):
     columns = ['id', 'cycle', 'setting1', 'setting2', 'setting3', 's1', 's2', 's3',
@@ -20,14 +75,12 @@ def format_to_json(raw_data):
         row = dataline.split(' ')
         tmp = dict()
         tmp['origin'] = 'cmapssdata'
+        tmp['updated'] = int(time.time())
         for idx, v in enumerate(columns):
             try:
-                print(row[idx], idx, v)
                 tmp[v] = row[idx]
             except IndexError as ierr:
-                print("Index not found : [%s]" %(idx))
-                print(ierr)
-            print(idx, v)
+                logger.warn("Index not found : [%s]" %(idx))
         jsons.append(tmp)
     return jsons
 
@@ -37,9 +90,8 @@ def get_raw_data():
 
 def read_file_from_s3(bucket='cmapssdata', key='sample.txt'):
     # s3://cmapssdata/train_FD001.txt
+    # key = 'train_FD001.txt'
     s3 = boto3.client('s3')
-    # for bucket in s3.buckets.all():
-    #     print(bucket.name)
     # bucket = event['bucket'] if 'bucket' in event else 'cmapssdata'
     # key = event['key'] if 'key' in event else 'sample.txt'
   
@@ -48,9 +100,6 @@ def read_file_from_s3(bucket='cmapssdata', key='sample.txt'):
     file_content = response['Body'].read().decode('utf-8')
   
     lines = [line for line in file_content.split('\n')]
-    for line in lines:
-        print(line.split(','))
-    # return 'Hello from Lambda'
   
     return lines
 
@@ -66,7 +115,7 @@ def get_mock_data():
             "1 7 0.0010 0.0001 100.0 518.67 642.48 1592.32 1397.77 14.62 21.61 554.34 2388.02 9059.13 1.30 47.36 522.32 2388.03 8132.32 8.3974 0.03 392 2388 100.00 39.10 23.3774  ",
             "1 8 -0.0034 0.0003 100.0 518.67 642.56 1582.96 1400.97 14.62 21.61 553.85 2388.00 9040.80 1.30 47.24 522.47 2388.03 8131.07 8.4076 0.03 391 2388 100.00 38.97 23.3106  ",
             "1 9 0.0008 0.0001 100.0 518.67 642.12 1590.98 1394.80 14.62 21.61 553.69 2388.05 9046.46 1.30 47.29 521.79 2388.05 8125.69 8.3728 0.03 392 2388 100.00 39.05 23.4066  ",
-            "1 10 -0.0033 0.0001 100.0 518.67 641.71 1591.24 1400.46 14.62 21.61 553.59 2388.05 9051.70 1.30 47.03 521.79 2388.06 8129.38 8.4286 0.03 393 2388 100.00 38.95 23.4694  ",
+            "2 10 -0.0033 0.0001 100.0 518.67 641.71 1591.24 1400.46 14.62 21.61 553.59 2388.05 9051.70 1.30 47.03 521.79 2388.06 8129.38 8.4286 0.03 393 2388 100.00 38.95 23.4694  ",
             ""
     ]
 

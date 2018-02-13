@@ -16,20 +16,30 @@ def lambda_handler(event, context):
     try:
         logger.info("Processing event ::")
         logger.info(event)
-
+        device = event
         table_name = event['table_name'] if 'table_name' in event else 'device_status'
-        payload = create_mock_data(event)
-        for device in payload:
+        
+        alerts = check_notify_alert(device)
+        device['alerts'] = alerts
+        device['updated'] = int(time.time())
+        logger.info("payload for dynamodb insert::")
+        logger.info(device)
+        response = DynamoDB().insert_item(table_name, device)
+        
+        # for device in payload:
+        # payload = create_mock_data(event)
 
-            alerts = check_notify_alert(device)
-            device['alerts'] = alerts
-            device['updated'] = int(time.time())
-            logger.info("payload for dynamodb insert::")
-            logger.info(device)
-            response = DynamoDB().insert_item(table_name, device)
+        #     alerts = check_notify_alert(device)
+        #     device['alerts'] = alerts
+        #     device['updated'] = int(time.time())
+        #     logger.info("payload for dynamodb insert::")
+        #     logger.info(device)
+        #     response = DynamoDB().insert_item(table_name, device)
         return response
     except Exception as exp:
         logger.exception("Exception occured in lambda func %s", exp)
+
+
 
 def create_mock_data(base_obj):
     '''
@@ -100,24 +110,71 @@ def check_notify_alert(d_reading_obj):
     '''
     try:
         alerts = {}
-        if not (0 <= d_reading_obj['x_mms'] <= 18):
+        if 'x_mms' in d_reading_obj and not (0 <= d_reading_obj['x_mms'] <= 18):
             alerts['x_mms'] = d_reading_obj['x_mms']
-        if not (0 <= d_reading_obj['y_mms'] <= 21):
+        if 'y_mms' in d_reading_obj and not (0 <= d_reading_obj['y_mms'] <= 21):
             alerts['y_mms'] = d_reading_obj['y_mms']
-        if not (0 <= d_reading_obj['z_mms'] <= 15):
+        if 'z_mms' in d_reading_obj and not (0 <= d_reading_obj['z_mms'] <= 15):
             alerts['z_mms'] = d_reading_obj['z_mms']
-        if not (5 <= d_reading_obj['x_hz'] <= 47):
+        if 'x_hz' in d_reading_obj and  not (5 <= d_reading_obj['x_hz'] <= 47):
             alerts['x_hz'] = d_reading_obj['x_hz']
-        if not (5 <= d_reading_obj['y_hz'] <= 31):
+        if 'y_hz' in d_reading_obj and not (5 <= d_reading_obj['y_hz'] <= 31):
             alerts['y_hz'] = d_reading_obj['y_hz']
-        if not (5 <= d_reading_obj['z_hz'] <= 51):
+        if 'z_hz' in d_reading_obj and not (5 <= d_reading_obj['z_hz'] <= 51):
             alerts['z_hz'] = d_reading_obj['z_hz']
         return alerts    
     except Exception as exp:
         raise exp
 
 
+def get_cmapssdata_mock():
+    static_cmapss = {
+        "coordinates": {
+            "Latitude": "12.9716",
+            "Longitude": "77.5946"
+        },
+        "current": 3,
+        "cycle": "10",
+        "humidity": 31,
+        "id": "1",
+        "load": 480,
+        "origin": "cmapssdata",
+        "power": "55MW",
+        "s1": "518.67",
+        "s10": "1.30",
+        "s11": "47.03",
+        "s12": "521.79",
+        "s13": "2388.06",
+        "s14": "8129.38",
+        "s15": "8.4286",
+        "s16": "0.03",
+        "s17": "393",
+        "s18": "2388",
+        "s19": "100.00",
+        "s2": "641.71",
+        "s20": "38.95",
+        "s21": "23.4694",
+        "s3": "1591.24",
+        "s4": "1400.46",
+        "s5": "14.62",
+        "s6": "21.61",
+        "s7": "553.59",
+        "s8": "2388.05",
+        "s9": "9051.70",
+        "setting1": "-0.0033",
+        "setting2": "0.0001",
+        "setting3": "100.0",
+        "speed_rpm": 3000,
+        "status": "Halted",
+        "temperature": 172,
+        "updated": 1518179095,
+        "voltage": "10.5 KV"
+        }
+    return static_cmapss
+
+
 if __name__ == "__main__":
     print("Foo")
-    foo = create_mock_data(None)
+    # foo = create_mock_data(None)
+    foo = get_cmapssdata_mock()
     print(foo)

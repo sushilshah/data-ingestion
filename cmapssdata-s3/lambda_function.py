@@ -1,6 +1,8 @@
 import boto3, json
 import logging
 import time
+from random import randint
+import random
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -19,6 +21,7 @@ def lambda_handler(event, context):
     # batch_write(item_list)
     for item in item_list:
         try:
+            item = add_some_mock_vals(item)
             logger.info("inserting item : %s", item)
             logger.info(int(time.time()))
             response = insert_to_dynamo(item)
@@ -34,8 +37,8 @@ def lambda_handler(event, context):
     
     return {'Hello' : 'World'}
 
-
-
+  
+  
 def batch_write(item_list):
     try:
         dynamodb = boto3.resource('dynamodb')
@@ -118,6 +121,32 @@ def get_mock_data():
             "2 10 -0.0033 0.0001 100.0 518.67 641.71 1591.24 1400.46 14.62 21.61 553.59 2388.05 9051.70 1.30 47.03 521.79 2388.06 8129.38 8.4286 0.03 393 2388 100.00 38.95 23.4694  ",
             ""
     ]
+
+def add_some_mock_vals(item):
+    
+    mock = item if item else dict()
+    '''
+    Acceptable values:
+    x_mms : 0-18, y_mms : 0-21, z_mms : 0-15, x_hz  : 5-47, y_hz  : 5-31, z_hz  : 5-51'''
+    # mock['x_mms'], mock['y_mms'], mock['z_mms'], mock['x_hz'], mock['y_hz'], mock['z_hz'] = \
+    # [randint(0,20), randint(0,23), randint(0,20), randint(5,50), randint(5,35), randint(5,53)]
+        
+    device_statuses = ['Running', 'Halted', 'Idle']
+    device_status = random.choice(device_statuses)
+    coordinates = {"Latitude" : '12.9716',
+                  "Longitude" : '77.5946'}
+    load = 480
+    speed_rpm = 3000
+    power = '55MW'
+    current = randint(0,50)
+    voltage = '10.5 KV'
+    temperature = randint(0,500) 
+    humidity = randint(0,100)
+    mock['current'], mock['voltage'], mock['temperature'], mock['humidity'], \
+    mock['coordinates'], mock['load'], mock['speed_rpm'], mock['power'], mock['status'] =\
+     [current, voltage, temperature, humidity, coordinates, load, speed_rpm, power, device_status ]
+    return mock
+ 
 
 if __name__ == '__main__':
     lambda_handler(None, None)

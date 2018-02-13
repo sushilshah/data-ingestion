@@ -103,15 +103,16 @@ def upsert():
             'id': key
         },
         ExpressionAttributeNames={
-          '#todo_text': 'text',
+          '#current_val': 'current',
+          '#cycle_val' : 'cycle'
         },
         ExpressionAttributeValues={
           ':current': data['current'],
           ':cycle': data['cycle'],
-          ':updated': data['updatedAt'],
+          ':updated': data['updated'],
         },
-        UpdateExpression='SET current = :current, '
-                         'cycle = :cycle, '
+        UpdateExpression='SET #current_val = :current, '
+                         '#cycle_val = :cycle, '
                          'updated = :updated',
         ReturnValues='ALL_NEW',
     )

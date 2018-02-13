@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         logger.info("Processing event ::")
         logger.info(event)
         device = event
-        table_name = event['table_name'] if 'table_name' in event else 'device_status'
+        table_name = event['table_name'] if 'table_name' in event else 'vib-mon-sls-device-dev'
         
         alerts = check_notify_alert(device)
         device['alerts'] = alerts

@@ -9,7 +9,9 @@ dynamodb = boto3.resource('dynamodb')
 
 def lambda_handler(event, context):
     try:
-        table_name = 'device_status'
+        # table_name = 'device_status'
+        table_name = 'vib-mon-sls-device-dev'
+
         data = update_event(event, table_name)
         return data
     except Exception as exp:
@@ -61,15 +63,39 @@ def update_event(item, table_name):
         },
         ExpressionAttributeNames={
           '#current_val': 'current',
-          '#cycle_val' : 'cycle'
+          '#cycle_val' : 'cycle',
+          '#status_val' : 'status',
+          '#load_val' : 'load',
         },
         ExpressionAttributeValues={
           ':current': data['current'],
           ':cycle': data['cycle'],
           ':updated': data['updated'],
+          ':status': data['status'],
+          ':temperature': data['temperature'],
+          ':voltage' : data['voltage'],
+          ':speed_rpm' : data['speed_rpm'],
+          ':power' : data['power'],
+          ':load' : data['load'],
+          ':humidity': data['humidity'],
+          ':s1': data['s1'],
+          ':s2': data['s2'],
+          ':s3' : data['s3'],
+          ':s4' : data['s4'],
         },
         UpdateExpression='SET #current_val = :current, '
                          '#cycle_val = :cycle, '
+                         '#status_val = :status, '
+                         'temperature = :temperature, '
+                         'voltage = :voltage, '
+                         'speed_rpm = :speed_rpm, '
+                         'power = :power, '
+                         '#load_val = :load, '
+                         'humidity = :humidity, '
+                         's1 = :s1, '
+                         's2 = :s2, '
+                         's3 = :s3, '
+                         's4 = :s4, '
                          'updated = :updated',
         ReturnValues='ALL_NEW',
     )

@@ -12,8 +12,9 @@ def lambda_handler(event, context):
         # table_name = 'device_status'
         table_name = 'vib-mon-sls-device-dev'
 
-        data = update_event(event, table_name)
-        return data
+        # response = update_event(event, table_name)
+        response = update_event_as_is(event, table_name)
+        return response
     except Exception as exp:
         logger.exception(exp)
 
@@ -101,6 +102,38 @@ def update_event(item, table_name):
     )
     
     print(response)
+    return response
+
+def update_event_as_is(item, table_name):
+    data = {
+            "id" : "namah",
+            "humidity" : 10,
+            "x" : 12,
+            "y": 11
+           }
+    expression_str = ''
+    eav = {}
+    dynamodb = boto3.resource('dynamodb')
+    
+    table = dynamodb.Table(table_name)
+    # id_key = 'namah'
+    id_key = item['id']
+    del item['id']
+
+    for key in item:
+        expression_str += key + '= :' + key + ', '
+        eav[':' + key] = item[key]
+    updateExp = 'SET ' + expression_str.strip(', ')
+    # key = data['id']
+    # response = table.update_item(Key=key,   Item=data)
+    response = table.update_item(
+        Key={
+            'id': id_key
+        },
+        ExpressionAttributeValues=eav,
+        UpdateExpression=updateExp,
+        ReturnValues='ALL_NEW',
+    )
     return response
 
 def insert_item(item, table_name):

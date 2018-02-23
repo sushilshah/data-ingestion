@@ -17,7 +17,8 @@ import decimal
 
 def lambda_handler(event, context):
     # TODO implement
-    data = upsert()
+    # data = upsert()
+    data = test()
     # dynamo = boto3.client('dynamodb')
     # print('Loading function')
     # # lambda dynamo, x: dynamo.scan(**x)
@@ -121,3 +122,66 @@ def upsert():
     print(response)
     return response 
     
+def test():
+    data = {
+        "humidity": 86,
+        "power": "55MW",
+        "s1": "18.67",
+        "s10": "1.30",
+        "s11": "47.03",
+        "s2": "41.71",
+        "s3": "1591.24",
+        "speed_rpm": 3000,
+        "temperature": 172,
+        "updated": 1518179095,
+        "voltage": "10.5 KV"
+    }
+    # print(data)
+    foo = ''
+    eav = {}
+    for key in data:
+        # UpdateExpression='SET #current_val = :current, '
+        #                  '#cycle_val = :cycle, '
+        #                  'updated = :updated',
+        # foo += key + '= :' + data[key] + ','
+        #  ExpressionAttributeValues={
+        #   ':updated': data['updated'],
+        #   ':temperature': data['temperature'],
+        #   ':voltage' : data['voltage'],
+        #   ':speed_rpm' : data['speed_rpm'],
+        #   ':humidity': data['humidity'],
+        #   ':s1': data['s1'],
+        #   ':s2': data['s2'],
+        #   ':s3' : data['s3'],
+        #   ':s4' : data['s4'],
+        # }
+        print(data[key])
+        # foo += key + '= :' + str(data[key]) + ', '
+        foo += key + '= :' + key + ', '
+        eav[':' + key] = data[key]
+    print(foo)
+    print(eav)
+    updateExp = foo.strip(', ')
+    dynamodb = boto3.resource('dynamodb')
+    
+    table = dynamodb.Table('device_status')
+    # response = table.put_item(Item=data)
+    table_name = 'device_status'
+    # key = data['id']
+    key = 'namah'
+    # response = table.update_item(Key=key,   Item=data)
+    response = table.update_item(
+        Key={
+            'id': key
+        },
+        ExpressionAttributeValues=eav,
+        UpdateExpression=updateExp,
+        ReturnValues='ALL_NEW',
+    )
+    return response
+
+if __name__ == '__main__':
+    print("foo")
+    test()
+    foo = "val, val2, "
+    # print(foo.strip(', '))

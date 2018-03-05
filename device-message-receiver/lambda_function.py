@@ -2,6 +2,9 @@ import boto3
 import json
 import logging
 
+from decimal import *
+import time
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -120,9 +123,15 @@ def update_event_as_is(item, table_name):
     id_key = item['id']
     del item['id']
 
+    item['updated'] = int(time.time())
     for key in item:
         expression_str += key + '= :' + key + ', '
-        eav[':' + key] = item[key]
+        # Quick and shameful Hack
+        if(type(item[key]) is float):
+            # eav[':' + key] = Decimal(item[key])
+            eav[':' + key] = str(item[key])
+        else:
+            eav[':' + key] = item[key]
     updateExp = 'SET ' + expression_str.strip(', ')
     # key = data['id']
     # response = table.update_item(Key=key,   Item=data)
@@ -132,7 +141,7 @@ def update_event_as_is(item, table_name):
         },
         ExpressionAttributeValues=eav,
         UpdateExpression=updateExp,
-        ReturnValues='ALL_NEW',
+        ReturnValues='UPDATED_NEW',
     )
     return response
 

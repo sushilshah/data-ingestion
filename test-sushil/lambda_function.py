@@ -175,13 +175,26 @@ def test():
             'id': key
         },
         ExpressionAttributeValues=eav,
-        UpdateExpression=updateExp,
+        UpdateExpression='SET ' + updateExp,
         ReturnValues='ALL_NEW',
     )
     return response
 
 if __name__ == '__main__':
     print("foo")
-    test()
+    # test()
     foo = "val, val2, "
     # print(foo.strip(', '))
+    foo = {'id': 'om', 'x': 0.06874322891235352, 'y': -0.035399436950683594, 'z': -0.05521583557128906, 'alpha': 93.0841661221569, 'beta': 29.85872516704128, 'gamma': -5.782607130814412}
+    print(foo)
+    print(type(foo['x']))
+    if(type(foo['x']) is float):
+        print("FFLoat")
+    from decimal import *
+    print(type(Decimal(foo['x'])))
+    if(type(Decimal(foo['x'])) is Decimal):
+        print("Decc")
+    else:
+        print("NOt decc")
+    import time
+    print(int(time.time()))
